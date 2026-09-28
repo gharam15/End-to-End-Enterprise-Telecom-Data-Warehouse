@@ -1,0 +1,205 @@
+version: 2
+
+models:
+
+  - name: fact_billing
+    description: >
+      Billing fact table containing customer billing transactions,
+      invoice and due dates, charges, payment status, payment method,
+      and contract-related billing information.
+
+    columns:
+
+      - name: billing_id
+        description: Unique identifier for each billing transaction.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: customer_sk
+        description: Surrogate key referencing the customer dimension.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('dim_customer')
+              field: customer_sk
+
+      - name: invoice_date_sk
+        description: Surrogate key referencing the invoice date in dim_date.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_sk
+
+      - name: due_date_sk
+        description: Surrogate key referencing the payment due date in dim_date.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_sk
+
+      - name: billing_period
+        description: Billing period associated with the transaction.
+
+      - name: monthly_charges
+        description: Monthly recurring charge for the customer.
+
+      - name: total_amount
+        description: Total amount charged in the billing transaction.
+
+      - name: late_fee
+        description: Late payment fee applied to the transaction.
+
+      - name: payment_status
+        description: Current payment status of the billing transaction.
+        data_tests:
+          - accepted_values:
+              values:
+                - Late
+                - Paid
+                - Pending
+
+      - name: payment_method
+        description: Payment method used by the customer.
+        data_tests:
+          - accepted_values:
+              values:
+                - Bank transfer (automatic)
+                - Credit card (automatic)
+                - Electronic check
+                - Mailed check
+
+      - name: contract
+        description: Customer contract type associated with the billing transaction.
+
+      - name: created_at
+        description: Timestamp when the billing transaction was created.
+
+      - name: ingestion_timestamp
+        description: Timestamp when the record was loaded into the data platform.
+
+
+  - name: fact_cdr_usage
+    description: >
+      Call Detail Record fact table containing telecom activity metrics
+      such as SMS, calls, and internet usage by cell and date.
+
+    columns:
+
+      - name: cdr_sk
+        description: Unique surrogate key for each CDR fact record.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: cdr_cell_sk
+        description: Surrogate key referencing the CDR cell dimension.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('dim_cdr_cell')
+              field: cdr_cell_sk
+
+      - name: date_sk
+        description: Surrogate key referencing the event date in dim_date.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_sk
+
+      - name: event_datetime
+        description: Original event datetime associated with telecom activity.
+
+      - name: sms_in
+        description: Number or activity measure of incoming SMS events.
+
+      - name: sms_out
+        description: Number or activity measure of outgoing SMS events.
+
+      - name: call_in
+        description: Incoming call activity measure.
+
+      - name: call_out
+        description: Outgoing call activity measure.
+
+      - name: internet_activity
+        description: Internet usage activity measure.
+
+      - name: source_file
+        description: Name of the source CDR file from which the record was loaded.
+
+      - name: source_loaded_at
+        description: Timestamp when the source record was loaded into SQL Server.
+
+      - name: ingestion_timestamp
+        description: Timestamp when the record was loaded into PostgreSQL staging.
+
+
+  - name: fact_customer_support
+    description: >
+      Customer support fact table containing support tickets,
+      ticket categories, customer information, response timestamps,
+      resolution details, and satisfaction ratings.
+
+    columns:
+
+      - name: ticket_id
+        description: Unique identifier for each support ticket.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: support_category_sk
+        description: Surrogate key referencing the support category dimension.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('dim_support_category')
+              field: support_category_sk
+
+      - name: purchase_date_sk
+        description: Surrogate key referencing the product purchase date in dim_date.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_sk
+
+      - name: customer_age
+        description: Age of the customer associated with the support ticket.
+
+      - name: customer_gender
+        description: Gender value provided in the source support dataset.
+
+      - name: product_purchased
+        description: Product associated with the customer support ticket.
+
+      - name: ticket_subject
+        description: Subject or title of the support request.
+
+      - name: ticket_description
+        description: Detailed description of the customer support issue.
+
+      - name: ticket_status
+        description: Current status of the support ticket.
+        data_tests:
+          - accepted_values:
+              values:
+                - Closed
+                - Open
+                - Pending Customer Response
+
+      - name: resolution
+        description: Resolution information recorded for the support ticket.
+
+      - name: first_response_time
+        description: Timestamp of the first response to the customer.
+
+      - name: time_to_resolution
+        description: Timestamp associated with ticket resolution.
+
+      - name: customer_satisfaction_rating
+        description: Customer satisfaction rating on a scale from 1 to 5.

@@ -1,0 +1,20 @@
+select
+    lat,
+    lon,
+    mcc,
+    mnc,
+    lac,
+    cellid as cell_id,
+    average_signal_strength,
+    range,
+    samples,
+    changeable,
+    upper(radio) as radio,
+    rnc,
+    cid,
+    tac,
+    sid,
+    nid,
+    bid,
+    ingestion_timestamp
+from {{ source('telecom_staging', 'network_cells') }}

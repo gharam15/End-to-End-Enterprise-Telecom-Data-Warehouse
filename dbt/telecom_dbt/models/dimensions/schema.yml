@@ -1,0 +1,80 @@
+version: 2
+
+models:
+
+  - name: dim_customer
+    description: >
+      Customer dimension containing the unique customer business key
+      and the surrogate key used across fact tables.
+
+    columns:
+
+      - name: customer_sk
+        description: Surrogate key uniquely identifying each customer record.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: customer_id
+        description: Business identifier of the customer from the source system.
+        data_tests:
+          - not_null
+          - unique
+
+
+  - name: dim_date
+    description: >
+      Calendar date dimension used to support time-based analysis
+      across billing, CDR, and customer support facts.
+
+    columns:
+
+      - name: date_sk
+        description: Surrogate key uniquely identifying each calendar date.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: full_date
+        description: Actual calendar date represented by the dimension record.
+        data_tests:
+          - not_null
+          - unique
+
+
+  - name: dim_cell
+    description: >
+      Network cell dimension built from OpenCellID data and used
+      to describe physical telecom network cell locations.
+
+    columns:
+
+      - name: cell_sk
+        description: Surrogate key uniquely identifying each network cell record.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: cell_id
+        description: Source network cell identifier from OpenCellID.
+        data_tests:
+          - not_null
+
+
+  - name: dim_cdr_cell
+    description: >
+      Dedicated CDR cell dimension containing cell identifiers
+      originating from the Telecom Italia CDR dataset.
+
+    columns:
+
+      - name: cdr_cell_sk
+        description: Surrogate key uniquely identifying each CDR cell.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: cell_id
+        description: Cell identifier associated with CDR activity records.
+        data_tests:
+          - not_null

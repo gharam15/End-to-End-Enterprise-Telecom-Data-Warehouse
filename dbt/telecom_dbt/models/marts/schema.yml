@@ -1,0 +1,74 @@
+version: 2
+
+models:
+
+  - name: mart_billing_summary
+    description: >
+      Aggregated billing mart used to analyze invoice activity,
+      billing trends, and revenue-related metrics over time.
+
+    columns:
+
+      - name: invoice_date_sk
+        description: Surrogate key representing the invoice date.
+        data_tests:
+          - not_null
+
+      - name: total_invoices
+        description: Total number of invoices generated for the aggregation level.
+        data_tests:
+          - not_null
+
+
+  - name: mart_customer_churn
+    description: >
+      Customer churn analytical mart summarizing customer counts
+      and churn-related metrics by contract type.
+
+    columns:
+
+      - name: contract
+        description: Customer contract type used for churn analysis.
+        data_tests:
+          - not_null
+
+      - name: total_customers
+        description: Total number of customers within the contract group.
+        data_tests:
+          - not_null
+
+
+  - name: mart_network_usage
+    description: >
+      Aggregated telecom usage mart summarizing CDR activity
+      by date and CDR cell identifier.
+
+    columns:
+
+      - name: date_sk
+        description: Surrogate key representing the telecom activity date.
+        data_tests:
+          - not_null
+
+      - name: cell_id
+        description: CDR cell identifier associated with aggregated network usage.
+        data_tests:
+          - not_null
+
+
+  - name: mart_support_performance
+    description: >
+      Customer support analytical mart used to monitor ticket volumes
+      and support performance metrics over time.
+
+    columns:
+
+      - name: purchase_date_sk
+        description: Surrogate key representing the related customer purchase date.
+        data_tests:
+          - not_null
+
+      - name: total_tickets
+        description: Total number of support tickets within the aggregation level.
+        data_tests:
+          - not_null

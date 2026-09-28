@@ -1,0 +1,13 @@
+telecom_dbt:
+  outputs:
+    dev:
+      type: postgres
+      host: postgres
+      port: 5432
+      user: postgres
+      pass: "123"
+      dbname: telecom_dw
+      schema: dw
+      threads: 4
+
+  target: dev

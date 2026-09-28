@@ -1,0 +1,65 @@
+version: 2
+
+models:
+
+  - name: stg_customers
+    description: Cleaned and standardized customer and churn data from the CRM source.
+
+    columns:
+      - name: customer_id
+        description: Unique business identifier for each customer.
+        data_tests:
+          - not_null
+          - unique
+
+
+  - name: stg_network_cells
+    description: Cleaned and standardized OpenCellID network cell data.
+
+    columns:
+      - name: cell_id
+        description: Identifier for the network cell.
+        data_tests:
+          - not_null
+
+
+  - name: stg_cdr_usage
+    description: Cleaned telecom CDR activity data for SMS, calls, and internet usage.
+
+    columns:
+      - name: event_datetime
+        description: Datetime associated with the telecom activity event.
+        data_tests:
+          - not_null
+
+      - name: cell_id
+        description: Cell identifier associated with the CDR event.
+        data_tests:
+          - not_null
+
+
+  - name: stg_billing
+    description: Cleaned and standardized customer billing transaction data.
+
+    columns:
+      - name: billing_id
+        description: Unique identifier for each billing transaction.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: customer_id
+        description: Business identifier of the customer associated with the bill.
+        data_tests:
+          - not_null
+
+
+  - name: stg_customer_support
+    description: Cleaned and standardized customer support ticket data.
+
+    columns:
+      - name: ticket_id
+        description: Unique identifier for each customer support ticket.
+        data_tests:
+          - not_null
+          - unique

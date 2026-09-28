@@ -1,0 +1,33 @@
+version: 2
+
+sources:
+  - name: telecom_staging
+    schema: staging
+
+    tables:
+
+      - name: network_cells
+        loaded_at_field: ingestion_timestamp
+        freshness:
+          warn_after:
+            count: 2
+            period: day
+          error_after:
+            count: 3
+            period: day
+
+      - name: customers
+
+      - name: cdr_usage
+        loaded_at_field: ingestion_timestamp
+        freshness:
+          warn_after:
+            count: 2
+            period: day
+          error_after:
+            count: 7
+            period: day
+
+      - name: billing
+
+      - name: customer_support
