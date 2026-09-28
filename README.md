@@ -207,28 +207,27 @@ Network ──────┘
 - Source freshness checks
 - Final dbt validation
 - Pipeline monitoring
-
 ### Airflow Pipeline Screenshots
 
 #### Master Pipeline
 
-![Airflow Master Pipeline](<docs/images/Airflow telecom master pipeline.PNG>)
+![Airflow Master Pipeline](docs/images/airflow_master_pipeline.png)
 
 #### Billing Pipeline
 
-![Airflow Billing Pipeline](<docs/images/Airflow telecom billing pipeline.PNG>)
+![Airflow Billing Pipeline](docs/images/airflow_billing_pipeline.png)
 
 #### CDR Pipeline
 
-![Airflow CDR Pipeline](<docs/images/Airflow telecom cdr pipeline.PNG>)
+![Airflow CDR Pipeline](docs/images/airflow_cdr_pipeline.png)
 
 #### Network Pipeline
 
-![Airflow Network Pipeline](<docs/images/Airflow telecom network pipeline.PNG>)
+![Airflow Network Pipeline](docs/images/airflow_network_pipeline.png)
 
 #### Support Pipeline
 
-![Airflow Support Pipeline](<docs/images/Airflow telecom support pipeline.PNG>)
+![Airflow Support Pipeline](docs/images/airflow_support_pipeline.png)
 
 ---
 
@@ -410,6 +409,7 @@ cd telecom-data-platform
 ### 2. Create `.env`
 
 Create the environment file locally and add the required credentials.
+
 
 > Do not commit `.env` to GitHub.
 
