@@ -1,0 +1,172 @@
+services:
+
+  postgres:
+    image: postgres:18
+    container_name: telecom_postgres
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+    restart: unless-stopped
+
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: telecom_sqlserver
+
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${SQLSERVER_SA_PASSWORD}
+
+    ports:
+      - "1433:1433"
+
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./data/landing/cdr:/var/opt/mssql/landing/cdr
+
+    restart: unless-stopped
+
+
+  dbt:
+    image: ghcr.io/dbt-labs/dbt-postgres:1.8.2
+    container_name: telecom_dbt
+
+    depends_on:
+      - postgres
+
+    volumes:
+      - ./dbt/telecom_dbt:/usr/app
+      - ./dbt/profiles.yml:/root/.dbt/profiles.yml
+
+    working_dir: /usr/app
+
+    entrypoint: ["/bin/sh", "-c"]
+
+    command:
+      - "sleep infinity"
+
+    restart: unless-stopped
+
+
+  airflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+
+    image: telecom-airflow:2.10.5-dbt
+    container_name: telecom_airflow
+
+    env_file:
+      - .env
+
+    depends_on:
+      - postgres
+      - sqlserver
+
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+
+      AIRFLOW__WEBSERVER__WEB_SERVER_MASTER_TIMEOUT: 300
+      AIRFLOW__WEBSERVER__WEB_SERVER_WORKER_TIMEOUT: 300
+      AIRFLOW__WEBSERVER__WORKERS: 1
+
+      DBT_PROFILES_DIR: /opt/airflow/.dbt
+
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+      SQLSERVER_HOST: sqlserver
+      SQLSERVER_PORT: 1433
+      SQLSERVER_DB: telecom_source_db
+      SQLSERVER_USER: sa
+      SQLSERVER_PASSWORD: ${SQLSERVER_SA_PASSWORD}
+
+    ports:
+      - "8081:8080"
+
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./scripts:/opt/airflow/scripts
+      - ./data:/opt/airflow/data
+      - ./dbt/telecom_dbt:/opt/airflow/dbt/telecom_dbt
+      - ./dbt/profiles.yml:/opt/airflow/.dbt/profiles.yml
+
+    command:
+      - bash
+      - -c
+      - |
+        airflow db migrate
+
+        airflow users delete --username airflow || true
+        airflow users delete --username admin || true
+
+        airflow users create \
+          --username "${AIRFLOW_ADMIN_USERNAME}" \
+          --password "${AIRFLOW_ADMIN_PASSWORD}" \
+          --firstname Gharam \
+          --lastname Admin \
+          --role Admin \
+          --email "${AIRFLOW_ADMIN_EMAIL}"
+
+        airflow scheduler &
+        exec airflow webserver
+
+    restart: unless-stopped
+
+
+  metabase:
+    image: metabase/metabase:latest
+    container_name: telecom_metabase
+
+    depends_on:
+      - postgres
+
+    ports:
+      - "3000:3000"
+
+    restart: unless-stopped
+
+
+  dbt_docs:
+    image: ghcr.io/dbt-labs/dbt-postgres:1.8.2
+    container_name: telecom_dbt_docs
+
+    depends_on:
+      - postgres
+
+    volumes:
+      - ./dbt/telecom_dbt:/usr/app
+      - ./dbt/profiles.yml:/root/.dbt/profiles.yml
+
+    working_dir: /usr/app
+
+    ports:
+      - "8085:8085"
+
+    entrypoint: ["/bin/sh", "-c"]
+
+    command:
+      - >
+        dbt docs generate &&
+        dbt docs serve --host 0.0.0.0 --port 8085
+
+    restart: unless-stopped
+
+
+volumes:
+  postgres_data:
+  sqlserver_data:
